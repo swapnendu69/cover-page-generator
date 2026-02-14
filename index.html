@@ -161,32 +161,42 @@
         .pdf-content {
             width: 100%;
             height: 100%;
-            padding: 25.4mm;
+            padding: 0;
+            position: relative;
+        }
+
+        .pdf-inner {
+            position: absolute;
+            top: 25.4mm;
+            left: 25.4mm;
+            right: 25.4mm;
+            bottom: 25.4mm;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
         }
 
         .pdf-logo {
-            width: 120px;
-            height: 120px;
-            margin-bottom: 30px;
+            max-width: 100px;
+            max-height: 100px;
+            width: auto;
+            height: auto;
+            margin-bottom: 25px;
             object-fit: contain;
         }
 
         .pdf-title {
-            font-size: 32px;
+            font-size: 24px;
             font-weight: bold;
             border: 3px solid black;
-            padding: 15px 40px;
-            margin-bottom: 80px;
+            padding: 12px 30px;
+            margin-bottom: 50px;
             text-align: center;
         }
 
         .pdf-course-info {
             width: 100%;
-            margin-bottom: 60px;
+            margin-bottom: 40px;
         }
 
         .course-line {
@@ -200,7 +210,7 @@
 
         .pdf-section {
             width: 100%;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
 
         .section-title {
@@ -323,39 +333,41 @@
     <!-- Hidden PDF Preview -->
     <div id="pdfPreview" class="hidden">
         <div class="pdf-content">
-            <img id="pdfLogo" class="pdf-logo" src="" alt="Logo">
-            <div class="pdf-title">SESSIONAL REPORT</div>
-            
-            <div class="pdf-course-info">
-                <div class="course-line"><strong>Course Code:</strong> <span id="pdfCourseCode"></span></div>
-                <div class="course-line"><strong>Course Title:</strong> <span id="pdfCourseTitle"></span></div>
-            </div>
-
-            <div class="pdf-section">
-                <div class="section-title">Submitted To:</div>
-                <div class="info-box">
-                    <div id="pdfTeacherName"></div>
-                    <div id="pdfTeacherTitle"></div>
-                    <div id="pdfDepartment"></div>
-                    <div id="pdfUniversity"></div>
-                    <div id="pdfPostcode1"></div>
+            <div class="pdf-inner">
+                <img id="pdfLogo" class="pdf-logo" src="" alt="Logo">
+                <div class="pdf-title">SESSIONAL REPORT</div>
+                
+                <div class="pdf-course-info">
+                    <div class="course-line"><strong>Course Code:</strong> <span id="pdfCourseCode"></span></div>
+                    <div class="course-line"><strong>Course Title:</strong> <span id="pdfCourseTitle"></span></div>
                 </div>
-            </div>
 
-            <div class="pdf-section">
-                <div class="section-title">Submitted By:</div>
-                <div class="info-box">
-                    <div id="pdfStudentName"></div>
-                    <div>Student ID: <span id="pdfStudentID"></span></div>
-                    <div>Year: <span id="pdfYear"></span>, Term: <span id="pdfTerm"></span></div>
-                    <div id="pdfDepartment2"></div>
-                    <div id="pdfUniversity2"></div>
-                    <div id="pdfPostcode2"></div>
+                <div class="pdf-section">
+                    <div class="section-title">Submitted To:</div>
+                    <div class="info-box">
+                        <div id="pdfTeacherName"></div>
+                        <div id="pdfTeacherTitle"></div>
+                        <div id="pdfDepartment"></div>
+                        <div id="pdfUniversity"></div>
+                        <div id="pdfPostcode1"></div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="pdf-date">
-                <strong>Date of Submission:</strong> <span id="pdfSubmissionDate"></span>
+                <div class="pdf-section">
+                    <div class="section-title">Submitted By:</div>
+                    <div class="info-box">
+                        <div id="pdfStudentName"></div>
+                        <div>Student ID: <span id="pdfStudentID"></span></div>
+                        <div>Year: <span id="pdfYear"></span>, Term: <span id="pdfTerm"></span></div>
+                        <div id="pdfDepartment2"></div>
+                        <div id="pdfUniversity2"></div>
+                        <div id="pdfPostcode2"></div>
+                    </div>
+                </div>
+
+                <div class="pdf-date">
+                    <strong>Date of Submission:</strong> <span id="pdfSubmissionDate"></span>
+                </div>
             </div>
         </div>
     </div>
