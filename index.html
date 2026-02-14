@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ফ্রন্ট পেজ জেনারেটর</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Times New Roman', serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .form-section {
+            padding: 40px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="file"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Times New Roman', serif;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        input[type="file"] {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .logo-preview {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .logo-preview img {
+            max-width: 150px;
+            max-height: 150px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 15px 40px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Times New Roman', serif;
+        }
+
+        .btn-generate {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-generate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-reset {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-reset:hover {
+            background: #d0d0d0;
+        }
+
+        /* PDF Preview Styles */
+        #pdfPreview {
+            width: 210mm;
+            height: 297mm;
+            background: white;
+            margin: 0 auto;
+            padding: 0;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .pdf-content {
+            width: 100%;
+            height: 100%;
+            padding: 40px 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pdf-logo {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 30px;
+            object-fit: contain;
+        }
+
+        .pdf-title {
+            font-size: 32px;
+            font-weight: bold;
+            border: 3px solid black;
+            padding: 15px 40px;
+            margin-bottom: 80px;
+            text-align: center;
+        }
+
+        .pdf-course-info {
+            width: 100%;
+            margin-bottom: 60px;
+        }
+
+        .course-line {
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .course-line strong {
+            font-weight: bold;
+        }
+
+        .pdf-section {
+            width: 100%;
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-decoration: underline;
+        }
+
+        .info-box {
+            border: 2px solid #000;
+            padding: 20px;
+            font-size: 16px;
+            line-height: 1.8;
+        }
+
+        .pdf-date {
+            width: 100%;
+            margin-top: 60px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📄 Cover Page Generator</h1>
+            <p>Create a PDF of A4 size providing necessary information</p>
+        </div>
+
+        <div class="form-section">
+            <form id="frontPageForm">
+                <div class="form-group full-width">
+                    <label for="logo">Upload the logo of your university:</label>
+                    <input type="file" id="logo" accept="image/*" required>
+                    <div class="logo-preview" id="logoPreview"></div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="courseCode">Course Code:</label>
+                        <input type="text" id="courseCode" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="courseTitle">Course Title:</label>
+                        <input type="text" id="courseTitle" required>
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="teacherName">Teacher's Name</label>
+                    <input type="text" id="teacherName" required>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="teacherTitle">Teacher's Post:</label>
+                    <input type="text" id="teacherTitle" placeholder="Example: Professor" required>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="department">Discipline/Department:</label>
+                        <input type="text" id="department" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="university">University Name:</label>
+                        <input type="text" id="university" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="postcode">Post Code</label>
+                    <input type="text" id="postcode" placeholder="Example: Khulna-9208" required>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="studentName">Student's Name:</label>
+                        <input type="text" id="studentName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="studentID">Student ID:</label>
+                        <input type="text" id="studentID" required>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="year">Year:</label>
+                        <input type="text" id="year" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="term">Term:</label>
+                        <input type="text" id="term" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="submissionDate">Date of Submission:</label>
+                    <input type="text" id="submissionDate" required>
+                </div>
+
+                <div class="btn-container">
+                    <button type="submit" class="btn-generate">Generate the Cover Page</button>
+                    <button type="reset" class="btn-reset">Reset</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Hidden PDF Preview -->
+    <div id="pdfPreview" class="hidden">
+        <div class="pdf-content">
+            <img id="pdfLogo" class="pdf-logo" src="" alt="Logo">
+            <div class="pdf-title">SESSIONAL REPORT</div>
+            
+            <div class="pdf-course-info">
+                <div class="course-line"><strong>Course Code:</strong> <span id="pdfCourseCode"></span></div>
+                <div class="course-line"><strong>Course Title:</strong> <span id="pdfCourseTitle"></span></div>
+            </div>
+
+            <div class="pdf-section">
+                <div class="section-title">Submitted To:</div>
+                <div class="info-box">
+                    <div id="pdfTeacherName"></div>
+                    <div id="pdfTeacherTitle"></div>
+                    <div id="pdfDepartment"></div>
+                    <div id="pdfUniversity"></div>
+                    <div id="pdfPostcode1"></div>
+                </div>
+            </div>
+
+            <div class="pdf-section">
+                <div class="section-title">Submitted By:</div>
+                <div class="info-box">
+                    <div id="pdfStudentName"></div>
+                    <div>Student ID: <span id="pdfStudentID"></span></div>
+                    <div>Year: <span id="pdfYear"></span>, Term: <span id="pdfTerm"></span></div>
+                    <div id="pdfDepartment2"></div>
+                    <div id="pdfUniversity2"></div>
+                    <div id="pdfPostcode2"></div>
+                </div>
+            </div>
+
+            <div class="pdf-date">
+                <strong>Date of Submission:</strong> <span id="pdfSubmissionDate"></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let logoDataUrl = '';
+
+        // Logo Preview
+        document.getElementById('logo').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    logoDataUrl = event.target.result;
+                    const preview = document.getElementById('logoPreview');
+                    preview.innerHTML = `<img src="${logoDataUrl}" alt="Logo Preview">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Form Submit
+        document.getElementById('frontPageForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            if (!logoDataUrl) {
+                alert('Please insert the logo');
+                return;
+            }
+
+            // Populate PDF Preview
+            document.getElementById('pdfLogo').src = logoDataUrl;
+            document.getElementById('pdfCourseCode').textContent = document.getElementById('courseCode').value;
+            document.getElementById('pdfCourseTitle').textContent = document.getElementById('courseTitle').value;
+            document.getElementById('pdfTeacherName').textContent = document.getElementById('teacherName').value;
+            document.getElementById('pdfTeacherTitle').textContent = document.getElementById('teacherTitle').value;
+            
+            const dept = document.getElementById('department').value;
+            const uni = document.getElementById('university').value;
+            const post = document.getElementById('postcode').value;
+            
+            document.getElementById('pdfDepartment').textContent = dept;
+            document.getElementById('pdfDepartment2').textContent = dept;
+            document.getElementById('pdfUniversity').textContent = uni;
+            document.getElementById('pdfUniversity2').textContent = uni;
+            document.getElementById('pdfPostcode1').textContent = post;
+            document.getElementById('pdfPostcode2').textContent = post;
+            
+            document.getElementById('pdfStudentName').textContent = document.getElementById('studentName').value;
+            document.getElementById('pdfStudentID').textContent = document.getElementById('studentID').value;
+            document.getElementById('pdfYear').textContent = document.getElementById('year').value;
+            document.getElementById('pdfTerm').textContent = document.getElementById('term').value;
+            document.getElementById('pdfSubmissionDate').textContent = document.getElementById('submissionDate').value;
+
+            // Generate PDF
+            const element = document.getElementById('pdfPreview');
+            element.classList.remove('hidden');
+            
+            // Wait for images to load
+            setTimeout(() => {
+                html2canvas(element, {
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: '#ffffff'
+                }).then(canvas => {
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF({
+                        orientation: 'portrait',
+                        unit: 'mm',
+                        format: 'a4'
+                    });
+
+                    const imgData = canvas.toDataURL('image/png');
+                    const imgWidth = 210; // A4 width in mm
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                    
+                    pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+                    pdf.save('Cover_Page.pdf');
+                    
+                    element.classList.add('hidden');
+                    alert('The PDF is generated successfully! ✅');
+                }).catch(error => {
+                    element.classList.add('hidden');
+                    console.error('PDF generation error:', error);
+                    alert('There is an error generating the PDF. Try again!');
+                });
+            }, 500);
+        });
+
+        // Reset Form
+        document.getElementById('frontPageForm').addEventListener('reset', function() {
+            document.getElementById('logoPreview').innerHTML = '';
+            logoDataUrl = '';
+        });
+    </script>
+</body>
+</html>
